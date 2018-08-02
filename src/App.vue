@@ -38,7 +38,7 @@
                     </v-list>
                 </v-menu>
             </v-toolbar>
-            <jobs-list :sortBy="sortVar" :search="searchText" @newSelectedJob="handleSelectedJob"></jobs-list>
+            <jobs-list :sortBy="sortVar" :search="searchText" :passedTask="passTask" @newSelectedJob="handleSelectedJob"></jobs-list>
         
         </v-card>
       </v-flex>
@@ -80,7 +80,7 @@
                     <order-info :job="selectedJob"></order-info>
                 </v-tab-item>
                 <v-tab-item id='order_tasks_content'>
-                    <tasks :tasks="selectedTasks"></tasks>
+                    <tasks :tasks="selectedTasks" :job="selectedJob" @addTask="passTheTask"></tasks>
                 </v-tab-item>
                   <v-tab-item id='order_tasks_content'>
                     <customer-info></customer-info>
@@ -107,7 +107,8 @@ export default {
       isSearching:false,
       searchText:'',
       selectedJob:null,
-      selectedTasks:[]
+      selectedTasks:[],
+      passTask:null
     }
   },
   computed:{
@@ -147,6 +148,9 @@ export default {
       this.selectedJob = job;
       this.selectedTasks = job.tasks;
     },
+    passTheTask(taskObj) {
+      this.passTask = taskObj;
+    }
   },
 }
 </script>

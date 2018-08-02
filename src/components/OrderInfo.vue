@@ -1,29 +1,37 @@
 <template>
     <v-card>
         <v-card-text style="height:216.5px;">
-            <v-container fluid v-if="job !== null">
-                <v-layout row>
-                    <v-flex xs12 sm6 order-lg2>
-                        <table>
+            <v-container fluid v-if="job !== null" style="max-height:210px;overflow:auto;padding:0;">
+                <v-layout xs12 sm6 row>
+                    <v-flex xs12 sm6>
+                        <table style="width:100%;min-width:100px;">
                             <tr>
-                                <td class="order_info_lable">Due Date:</td>
-                                <td :class="job.last_inhand_date | returnPriorityColor">{{job.last_inhand_date | returnPriorityDates}}</td>
+                                <td class="order_info_lable" >Due Date:<div style="display:inline-block; font-size:10px;cursor:pointer;"><v-icon class="is-pulled-right has-text-info" style="font-size:18px;">edit</v-icon></div></td>
                             </tr>
                             <tr>
+                                <td class="order_info_data" v-html="returnDateHtml(job.last_inhand_date)"></td>
+                            </tr>
+                              <tr>
                                 <td class="order_info_lable">Sizing Due:</td>
-                                <td :class="job.sizing_due_date | returnPriorityColor">{{job.sizing_due_date | returnPriorityDates}}</td>
+                            </tr>
+                            <tr>
+                                <td :class="['order_info_data']" v-html="returnDateHtml(job.sizing_due_date)"></td>
                             </tr>
                         </table>
                     </v-flex>
-                    <v-flex sm6>
-                        <table>
+                    <v-flex xs12 sm6>
+                        <table style="width:100%;min-width:100px;">
                             <tr>
                                 <td class="order_info_lable">Status:</td>
-                                <td>{{job.status }}</td>
+                            </tr>
+                            <tr>
+                                <td class='order_info_data'>{{job.status}}</td>
                             </tr>
                             <tr>
                                 <td class="order_info_lable">Art Due:</td>
-                                <td :class="job.art_due_date | returnPriorityColor">{{job.art_due_date | returnPriorityDates}}</td>
+                            </tr>
+                            <tr>
+                                <td :class="['order_info_data']" v-html="returnDateHtml(job.art_due_date)"></td>
                             </tr>
                         </table>
                     </v-flex>
@@ -61,24 +69,44 @@ export default {
         },
         returnPriorityColor(date) {
             if(moment(date).isSameOrBefore(moment(Date.now()))){
-                return "red--text lighten-1 font-weight-black subheading";
+                return `<span :style="{fontWeight:'bolder'},{color:'#cc4040'}">${moment(date).format('MMM Do, YYYY')}</span>`;
             } else if(moment(date).subtract(7,'days').isSameOrBefore(moment(Date.now()))){
-                return "orange--text lighten-2 font-weight-bold subheading";
+                return `<span style="fontWeight:bold;color:#d8b000;">${moment(date).format('MMM Do, YYYY')}</span>`;
             } else {
-                return "black--text lighten-2 font-weight-normal subheading";
+                return `<span style="fontWeight:400,color:#333;">${moment(date).format('MMM Do, YYYY')}</span>`;
             }
         }
-    }
+    },
+    methods:{
+        returnDateHtml(date){
+                if(moment(date).isSameOrBefore(moment(Date.now()))){
+                return `<span style="font-weight:bolder;color:#cc4040;">${moment(date).format('MMM Do, YYYY')}</span>`;
+            } else if(moment(date).subtract(7,'days').isSameOrBefore(moment(Date.now()))){
+                return `<span style="font-weight:bold;color:#d8b000;">${moment(date).format('MMM Do, YYYY')}</span>`;
+            } else {
+                return `<span style="font-weight:400;color:#333;">${moment(date).format('MMM Do, YYYY')}</span>`;
+            }
+        }
+        }
 }
 </script>
 
 <style>
+.container {
+    padding:0;
+}
 .order_info_lable{
-    font-weight: bold;
+    font-weight:600;
     text-align: left;
+    letter-spacing: .9px;
+    color:#797979
+}
+.order_info_data{
+    border-bottom:1px solid lightgrey;
+    background-color: rgb(240, 240, 240);
 }
 td {
-    padding:5px; 
+    padding:3px; 
 }
 .hidden{
     visibility: hidden;

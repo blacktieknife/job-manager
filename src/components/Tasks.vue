@@ -7,14 +7,14 @@
                         <v-list>
                             <v-list-tile v-for="task in tasks" :key="task.title">
                                 <v-list-tile-action>
-                                <v-checkbox></v-checkbox>
+                                <v-checkbox class="done_check" @change="(checked)=>{handleDoneCheck(checked,task.id)}"></v-checkbox>
                                 </v-list-tile-action>
-                                <v-list-tile-content>
+                                <v-list-tile-content :id="'checkContent'+task.id">
                                 <v-list-tile-title><b>{{task.title}}</b> &nbsp; <small class="blue--text">By: {{task.finishDate | returnPriorityDates}}</small></v-list-tile-title>
                                 <v-list-tile-sub-title>{{task.description}}</v-list-tile-sub-title>
                                 </v-list-tile-content>
                                 <v-spacer></v-spacer>
-                                <v-list-tile-action>
+                                <v-list-tile-action :id="'editCheck'+task.id">
                                 <v-tooltip left>
                                     <v-btn 
                                     icon
@@ -29,7 +29,7 @@
                                     <span>Edit Task</span>
                                 </v-tooltip> 
                                 </v-list-tile-action>
-                                <v-list-tile-action>
+                                <v-list-tile-action :id="'removeCheck'+task.id">
                                 <v-tooltip left>   
                                     <v-btn 
                                     slot="activator"
@@ -58,9 +58,79 @@
             </v-container>            
         </v-card-text>
         <v-card-actions>
-          <v-btn flat color="cyan">Add Task</v-btn>
+          <v-btn flat color="cyan" @click="dialog = true">Add Task</v-btn>
         </v-card-actions>
-      </v-card>
+        <v-dialog
+            v-model="dialog"
+            max-width="450"
+            >
+            <v-card>
+                <v-card-title class="headline">Add Task</v-card-title>
+
+                <v-card-text>
+                    <v-flex xs12>
+                        <v-text-field label="Task Title" required max="70" v-model="title"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12>
+                        <v-textarea
+                            name="input-7-1"
+                            box
+                            label="Task Description"
+                            auto-grow
+                            v-model="textArea"
+                            required
+                            >
+                        </v-textarea>
+                    </v-flex>
+                    <v-flex xs12>
+                        <v-menu
+                            ref="menu2"
+                            :close-on-content-click="false"
+                            v-model="menu2"
+                            :nudge-right="40"
+                            :return-value.sync="finishByDate"
+                            lazy
+                            transition="scale-transition"
+                            offset-y
+                            full-width
+                            min-width="290px"
+                        >
+                            <v-text-field
+                            slot="activator"
+                            v-model="finishByDate"
+                            label="Finish Task Date"
+                            prepend-icon="event"
+                            readonly
+                            required
+                            ></v-text-field>
+                            <v-date-picker v-model="date" @input="$refs.menu2.save(date)"></v-date-picker>
+
+                        </v-menu>
+                    </v-flex>
+                </v-card-text>
+
+                <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn
+                    color="green darken-1"
+                    flat="flat"
+                    @click="dialog = false"
+                >
+                    Cancel
+                </v-btn>
+
+                <v-btn
+                    color="green darken-1"
+                    flat="flat"
+                    @click="()=>{addTask(job.id)}"
+                >
+                    Add Task
+                </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+    </v-card>
 </template>
 
 <script>
@@ -68,10 +138,15 @@ import moment from 'moment';
 export default {
     data() {
         return {
-
+            cvalue:false,
+            title:'',
+            checkedVal:'',
+            textArea:'',
+            dialog:false,
+            finishByDate: null,
         }
     },
-    props:['tasks'],
+    props:['tasks', 'job'],
     copmuted:{
 
     },
@@ -88,6 +163,34 @@ export default {
                 return "black--text lighten-2 font-weight-normal subheading";
             }
         }
+    },
+    methods: {
+        handleDoneCheck(checked, taskId) {
+            const taskElement = document.querySelector('#checkContent'+taskId);
+            if(checked) {
+                taskElement.style.textDecoration = 'line-through';
+            } else {
+                taskElement.style.textDecoration = '';
+            }
+        },
+        addTask(jobId) {
+            if(this.title && this.textArea && this.finishByDate) {
+                const taskObj = {
+                jobId:jobId,
+                title:this.title,
+                description:this.textArea,
+                finishByDate:this.finishByDate
+                }
+                this.$emit('addTask', taskObj);
+                this.dialog = false;
+                this.title = '';
+                this.textArea = '';
+                this.finishByDate = '';
+            }
+        }
+    },
+    created(){
+
     }
 }
 </script>

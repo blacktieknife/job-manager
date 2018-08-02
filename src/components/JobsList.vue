@@ -2,7 +2,7 @@
   <div style="height:325px; overflow:auto;">
       <v-list-tile ripple v-for="(job) in filteredJobs" :key="job.id" :jobid="job.id" class="v_list_item" @click="handleJobClick(job.id)">
           <v-list-tile-content style="border-bottom:1.3px solid silver;">
-          <v-list-tile-title>{{ job.id }} {{ job.jobName }}</v-list-tile-title>
+          <v-list-tile-title :title="job.jobName">{{ job.id }} {{ job.jobName }}</v-list-tile-title>
           <v-list-tile-sub-title style="font-size:.79rem">DueDate:{{job.last_inhand_date | moment}}  <span>Art Due: {{job.art_due_date | moment}}</span> <span>Art Due: {{job.art_due_date | moment}}</span></v-list-tile-sub-title>
           </v-list-tile-content>
           
@@ -99,7 +99,7 @@ export default {
       jobs:[],
     }
   },
-  props:['sortBy','search'],
+  props:['sortBy','search', 'passedTask'],
   filters:{
         moment(date){
             return moment(date).format("MMM Do, Y");
@@ -127,6 +127,20 @@ export default {
               this.searchTerm = val;
           } else {
               this.searchTerm = '';
+          }
+      },
+      passedTask(val){
+          if(val){
+              const foundEl = this.jobs.find(el=>el.id == val.jobId);
+              const newTask = {
+                  id:foundEl.tasks.length + 1,
+                  title:val.title,
+                  startDate:moment().format(),
+                  finishDate:val.finishByDate,
+                  description:val.description,
+                  completed:false,
+              }
+              foundEl.tasks.push(newTask);
           }
       }
   },  
@@ -232,10 +246,10 @@ export default {
                     keyWords:["purple", "green", "Red", "White"],
                     tasks:[
                         {
-                            title:"Ask for more time", startDate:"07/16/2018", finishDate:"7/25/2018", description:"Factory need more time to produce garments", completed:false
+                            id:1, title:"Ask for more time", startDate:"07/16/2018", finishDate:"7/25/2018", description:"Factory need more time to produce garments", completed:false
                         },
                         {
-                            title:"Follow up on post delivery", startDate:"07/16/2018", finishDate:"8/25/2018", description:"Call customer after event to ensure product was satisfactory", completed:false
+                            id:2, title:"Follow up on post delivery", startDate:"07/16/2018", finishDate:"8/25/2018", description:"Call customer after event to ensure product was satisfactory", completed:false
                         },
                     ],
                 },
